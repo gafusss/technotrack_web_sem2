@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from m_post.models import Post
+from m_post.models import Post, PostInclude
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -8,4 +8,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
+        fields = '__all__'
+
+
+class PostIncludeSerializer(serializers.ModelSerializer):
+    message = serializers.ReadOnlyField(source='message.id')
+
+    class Meta:
+        model = PostInclude
         fields = '__all__'

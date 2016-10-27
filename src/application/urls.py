@@ -22,7 +22,8 @@ from m_chat.views import ConferenceViewSet
 
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
-from m_post.views import PostViewSet
+from m_post.views import PostViewSet, PostIncludeViewSet
+from m_profile.views import UserProfileViewSet
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -50,8 +51,10 @@ class GroupViewSet(viewsets.ModelViewSet):
 router = routers.DefaultRouter()
 router.register(r'conference', ConferenceViewSet)
 router.register(r'post', PostViewSet)
+router.register(r'post_include', PostIncludeViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
+router.register(r'user_profiles', UserProfileViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),

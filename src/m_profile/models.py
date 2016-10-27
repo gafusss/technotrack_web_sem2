@@ -36,6 +36,9 @@ class Profile(EditableMixin, LikeableMixin):
 
 
 class UserProfile(Profile):
+    def __unicode__(self):
+        return self.first_name + ' ' + self.last_name
+
     first_name = models.CharField(max_length=100,
                                   blank=False,
                                   verbose_name=u'First name')
