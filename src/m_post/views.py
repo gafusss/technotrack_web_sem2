@@ -14,7 +14,7 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
 
     def perform_create(self, serializer):
-        serializer.save(sender=self.request.user)
+        serializer.save(sender=self.request.user.profile.all().first())
 
     def get_queryset(self):
         qs = super(PostViewSet, self).get_queryset()

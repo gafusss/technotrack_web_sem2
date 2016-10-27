@@ -6,6 +6,7 @@ from django.db import models
 from django.conf import settings
 
 from core.models import DeletableMixin, EditableMixin
+from m_event.models import CreateEventOnCreateMixin
 from m_like.models import LikeableMixin
 
 
@@ -63,8 +64,10 @@ class CommunityProfile(DeletableMixin, Profile):
                                    verbose_name=u'Description')
 
 
-class Friendship(DeletableMixin):
+class Friendship(DeletableMixin, CreateEventOnCreateMixin):
     # is magic
+    def get_user_for_event(self):
+        return self.request_from
 
     request_from = models.ForeignKey(Profile,
                                      related_name='friendship_request_sent',

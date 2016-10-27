@@ -13,10 +13,14 @@ from core.models import DeletableMixin, EditableMixin
 # TODO: db_index=True and meta: index_together [["f1", "f2"],]
 # Create your models here.
 from m_comment.models import CommentableMixin
+from m_event.models import CreateEventOnCreateMixin
 from m_like.models import LikeableMixin
 
 
-class Post(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin):
+class Post(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin, CreateEventOnCreateMixin):
+    def get_user_for_event(self):
+        return self.sender
+
     profile = models.ForeignKey('m_profile.Profile',
                                 db_index=True,
                                 verbose_name=u'Posted to',

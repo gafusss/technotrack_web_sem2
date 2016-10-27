@@ -4,6 +4,7 @@ from django.db import models
 
 from core.models import DeletableMixin, EditableMixin
 from m_comment.models import CommentableMixin
+from m_event.models import CreateEventOnCreateMixin
 from m_like.models import LikeableMixin
 from m_profile.models import Profile
 
@@ -14,7 +15,10 @@ from m_profile.models import Profile
 # TODO: on_delete?
 # TODO: other fields?
 
-class PhotoAlbum(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin):
+class PhotoAlbum(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin, CreateEventOnCreateMixin):
+    def get_user_for_event(self):
+        return self.owner
+
     owner = models.ForeignKey(Profile,
                               db_index=True,
                               verbose_name=u'Album owner',
@@ -27,7 +31,10 @@ class PhotoAlbum(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin)
                                    verbose_name=u'Description')
 
 
-class Photo(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin):
+class Photo(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin, CreateEventOnCreateMixin):
+    def get_user_for_event(self):
+        return self.album.owner
+
     album = models.ForeignKey(PhotoAlbum,
                               db_index=True,
                               verbose_name=u'Album',

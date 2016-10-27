@@ -5,3 +5,5 @@ from django.apps import AppConfig
 
 class MPostConfig(AppConfig):
     name = 'm_post'
+    def ready(self):
+        import signals

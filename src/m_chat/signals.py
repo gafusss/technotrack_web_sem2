@@ -15,8 +15,11 @@ def conference_membership_post_save(sender, instance, created, **kwargs):
         instance.conference.is_active = True
         instance.conference.save()
     else:
-        if instance.is_deleted:
+        if instance.is_deleted and not instance.is_deleted_was:
             instance.conference.member_count -= 1
+            if instance.conference.member_count == 0:
+                instance.conference.is_active = False
+            instance.conference.save()
 
 
 post_save.connect(message_post_save, Message, dispatch_uid='tt_message_post_save')

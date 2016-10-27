@@ -12,4 +12,3 @@ class DialogueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dialogue
         fields = '__all__'
-

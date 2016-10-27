@@ -6,6 +6,7 @@ from django.db import models
 
 # Create your models here.
 from core.models import EditableMixin, DeletableMixin
+from m_event.models import CreateEventOnCreateMixin
 from m_like.models import LikeableMixin
 
 
@@ -33,7 +34,10 @@ class CommentableMixin(models.Model):
         abstract = True
 
 
-class Comment(DeletableMixin, CommentableMixin, EditableMixin, LikeableMixin):
+class Comment(DeletableMixin, CommentableMixin, EditableMixin, LikeableMixin, CreateEventOnCreateMixin):
+    def get_user_for_event(self):
+        return self.profile
+
     profile = models.ForeignKey('m_profile.Profile',
                                 db_index=True,
                                 verbose_name=u'Comment from',

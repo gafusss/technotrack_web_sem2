@@ -6,9 +6,13 @@ from django.db import models
 
 # Create your models here.
 from core.models import DeletableMixin
+from m_event.models import CreateEventOnCreateMixin
 
 
-class Like(DeletableMixin):
+class Like(DeletableMixin, CreateEventOnCreateMixin):
+    def get_user_for_event(self):
+        return self.profile
+
     profile = models.ForeignKey('m_profile.Profile',
                                 verbose_name=u'Like from',
                                 related_name='like',

@@ -7,11 +7,6 @@ from django.db import models
 # TODO: FIXME: Decide what the fuck to do with these deletes
 from django.utils.datetime_safe import datetime
 
-
-#
-# NOTE TO SELF: DeletableMixin should ALWAYS be FIRST with MULTIPLE INHERITANCE
-#
-
 class DeletableMixin(models.Model):
     is_deleted = models.BooleanField(blank=False,
                                      null=False,
@@ -27,13 +22,6 @@ class DeletableMixin(models.Model):
                                       null=False,
                                       editable=False,
                                       verbose_name=u'Created at')
-
-    def delete(self, using=None, keep_parents=False):
-        self.is_deleted = True
-        self.deleted_at = datetime.now()
-        self.save()
-        from django.db.models.signals import post_delete
-        post_delete.send(sender=self.__class__)
 
     class Meta:
         abstract = True

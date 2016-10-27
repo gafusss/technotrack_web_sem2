@@ -6,8 +6,9 @@ from django.db import models
 
 
 # Create your models here.
-#TODO: SIGNALS FOR GENERATING EVENTS
+# TODO: SIGNALS FOR GENERATING EVENTS
 
+# TODO: FIXME: Deletable? On delete? wtf
 class Event(models.Model):
     profile = models.ForeignKey('m_profile.Profile',
                                 db_index=True,
@@ -22,3 +23,11 @@ class Event(models.Model):
     object_id = models.PositiveIntegerField()
     object = GenericForeignKey(ct_field='content_type',
                                fk_field='object_id')
+
+
+class CreateEventOnCreateMixin(models.Model):
+    def get_user_for_event(self):
+        pass
+
+    class Meta:
+        abstract = True
