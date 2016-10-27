@@ -11,18 +11,12 @@ from m_like.models import LikeableMixin
 
 
 # TODO: __unicode__ or __str__ (unicode on python2) AND meta verbose_name (_plural) AND unique?
-# TODO: on_delete?
 # TODO: other fields in profiles
 # Create your models here.
 
 
 class Profile(EditableMixin, LikeableMixin):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              verbose_name=u'Profile owner',
-                              related_name='profile',
-                              on_delete=models.CASCADE,
-                              blank=False)
-
+    pass
     # # denorm: active friends
     # friend = models.ManyToManyField('self',
     #                                 verbose_name=u'Friends',
@@ -40,6 +34,13 @@ class UserProfile(Profile):
     def __unicode__(self):
         return self.first_name + ' ' + self.last_name
 
+    owner = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                 verbose_name='Owner',
+                                 related_name='profile',
+                                 on_delete=models.CASCADE,
+                                 blank=False,
+                                 db_index=True)
+
     first_name = models.CharField(max_length=100,
                                   blank=False,
                                   verbose_name=u'First name')
@@ -56,6 +57,12 @@ class UserProfile(Profile):
 
 
 class CommunityProfile(DeletableMixin, Profile):
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              verbose_name=u'Profile owner',
+                              related_name='community_profile',
+                              on_delete=models.CASCADE,
+                              blank=False)
 
     name = models.CharField(blank=False,
                             max_length=256,
