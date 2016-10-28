@@ -57,7 +57,6 @@ class UserProfile(Profile):
 
 
 class CommunityProfile(DeletableMixin, Profile):
-
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               verbose_name=u'Profile owner',
                               related_name='community_profile',
@@ -71,19 +70,31 @@ class CommunityProfile(DeletableMixin, Profile):
                                    verbose_name=u'Description')
 
 
+# TODO: Add user field?
 class Friendship(DeletableMixin, CreateEventOnCreateMixin):
     # is magic
     def get_user_for_event(self):
+        return self.request_from_user
+
+    def get_profile_for_event(self):
         return self.request_from
 
     request_from = models.ForeignKey(Profile,
                                      related_name='friendship_request_sent',
                                      verbose_name=u'Request from',
                                      blank=False)
+    request_from_user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                          verbose_name=u'By user',
+                                          related_name='friendship_request_sent',
+                                          blank=False)
     request_to = models.ForeignKey(Profile,
                                    related_name='friendship_request',
                                    verbose_name=u'Request to',
                                    blank=False)
+    accepted_by_user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                         verbose_name=u'Accepted by user',
+                                         related_name='friendship_request',
+                                         blank=False)
     # is_active == (accepted and not deleted)
     is_active = models.BooleanField(blank=False,
                                     default=False,

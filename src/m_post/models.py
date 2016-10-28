@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.db import models
@@ -19,6 +20,9 @@ from m_like.models import LikeableMixin
 
 class Post(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin, CreateEventOnCreateMixin):
     def get_user_for_event(self):
+        return self.user
+
+    def get_profile_for_event(self):
         return self.sender
 
     profile = models.ForeignKey('m_profile.Profile',
@@ -30,6 +34,10 @@ class Post(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin, Creat
                                verbose_name=u'Sender',
                                related_name='posted',
                                blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             verbose_name=u'By user',
+                             related_name='post',
+                             blank=False)
     text = models.TextField(blank=True,
                             verbose_name=u'Post text')
     repost_count = models.PositiveIntegerField(default=0,

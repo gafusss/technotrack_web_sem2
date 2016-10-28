@@ -8,6 +8,7 @@ class ConferenceSerializer(serializers.ModelSerializer):
         model = Conference
         fields = ('id', 'owner', 'members', 'is_active', 'member_count', 'created_at', 'last_message')
 
+
 class DialogueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dialogue

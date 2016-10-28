@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -87,6 +88,10 @@ class Message(DeletableMixin):
                                verbose_name=u'Sender',
                                related_name='message',
                                blank=False)
+    sender_user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                    verbose_name=u'Sender user',
+                                    related_name='message',
+                                    blank=False)
     text = models.TextField(blank=True,
                             verbose_name=u'Message text')
 

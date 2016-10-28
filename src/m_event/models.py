@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -15,6 +16,10 @@ class Event(models.Model):
                                 verbose_name=u'Origin',
                                 related_name='event',
                                 blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             verbose_name=u'By user',
+                             related_name='event',
+                             blank=False)
     timestamp = models.DateTimeField(auto_now_add=True,
                                      blank=False,
                                      null=False,
@@ -27,7 +32,10 @@ class Event(models.Model):
 
 class CreateEventOnCreateMixin(models.Model):
     def get_user_for_event(self):
-        pass
+        raise Exception('FuckThatImNotDoingThatShitERROR')
+
+    def get_profile_for_event(self):
+        raise Exception('FuckThatImNotDoingThatShitERROR')
 
     class Meta:
         abstract = True

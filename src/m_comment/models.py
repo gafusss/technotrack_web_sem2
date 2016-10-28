@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -36,6 +37,9 @@ class CommentableMixin(models.Model):
 
 class Comment(DeletableMixin, CommentableMixin, EditableMixin, LikeableMixin, CreateEventOnCreateMixin):
     def get_user_for_event(self):
+        return self.sender
+
+    def get_profile_for_event(self):
         return self.profile
 
     profile = models.ForeignKey('m_profile.Profile',
@@ -43,6 +47,11 @@ class Comment(DeletableMixin, CommentableMixin, EditableMixin, LikeableMixin, Cr
                                 verbose_name=u'Comment from',
                                 related_name='comment',
                                 blank=False)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL,
+                               verbose_name=u'Commenter',
+                               related_name='comment',
+                               on_delete=models.CASCADE,
+                               blank=False)
     text = models.TextField(blank=True,
                             verbose_name=u'Comment text')
     content_type = models.ForeignKey(ContentType)

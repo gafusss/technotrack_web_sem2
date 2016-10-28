@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -11,12 +12,19 @@ from m_event.models import CreateEventOnCreateMixin
 
 class Like(DeletableMixin, CreateEventOnCreateMixin):
     def get_user_for_event(self):
+        return self.user
+
+    def get_profile_for_event(self):
         return self.profile
 
     profile = models.ForeignKey('m_profile.Profile',
                                 verbose_name=u'Like from',
                                 related_name='like',
                                 blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             verbose_name=u'By user',
+                             related_name='like',
+                             blank=False)
     dislike = models.BooleanField(blank=False,
                                   null=False,
                                   default=True)

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.db import models
 
 from core.models import DeletableMixin, EditableMixin
@@ -17,13 +18,20 @@ from m_profile.models import Profile
 
 class PhotoAlbum(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin, CreateEventOnCreateMixin):
     def get_user_for_event(self):
-        return self.owner
+        return self.user
 
-    owner = models.ForeignKey(Profile,
-                              db_index=True,
-                              verbose_name=u'Album owner',
-                              related_name='album',
-                              blank=False)
+    def get_profile_for_event(self):
+        return self.profile
+
+    profile = models.ForeignKey(Profile,
+                                db_index=True,
+                                verbose_name=u'Album owner',
+                                related_name='album',
+                                blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             verbose_name=u'By user',
+                             related_name='album',
+                             blank=False)
     name = models.CharField(blank=False,
                             max_length=256,
                             verbose_name=u'Album name')
@@ -33,13 +41,25 @@ class PhotoAlbum(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin,
 
 class Photo(DeletableMixin, EditableMixin, LikeableMixin, CommentableMixin, CreateEventOnCreateMixin):
     def get_user_for_event(self):
-        return self.album.owner
+        return self.user
+
+    def get_profile_for_event(self):
+        return self.profile
 
     album = models.ForeignKey(PhotoAlbum,
                               db_index=True,
                               verbose_name=u'Album',
                               related_name='photo',
                               blank=False)
+    profile = models.ForeignKey(Profile,
+                                db_index=True,
+                                verbose_name=u'Added by',
+                                related_name='photo',
+                                blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             verbose_name=u'By user',
+                             related_name='photo',
+                             blank=False)
 
     # TODO: upload location and filename?
     image = models.ImageField(blank=False,

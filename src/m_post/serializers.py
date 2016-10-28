@@ -5,6 +5,7 @@ from m_post.models import Post, PostInclude
 
 class PostSerializer(serializers.ModelSerializer):
     sender = serializers.ReadOnlyField(source='sender.id')
+    user = serializers.ReadOnlyField(source='user.id')
 
     class Meta:
         model = Post

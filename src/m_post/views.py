@@ -14,7 +14,9 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
 
     def perform_create(self, serializer):
-        serializer.save(sender=self.request.user.profile.all().first())
+        # TODO: Check if they match. Only give your profiles as options
+        serializer.save(sender=self.request.user.profile.all().first(),
+                        user=self.request.user)
 
     def get_queryset(self):
         qs = super(PostViewSet, self).get_queryset()
