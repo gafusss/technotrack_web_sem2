@@ -7,10 +7,20 @@ from django.db import models
 
 
 # Create your models here.
-# TODO: SIGNALS FOR GENERATING EVENTS
-
 # TODO: FIXME: Deletable? On delete? wtf
+from rest_framework import permissions
+
+
 class Event(models.Model):
+
+    def get_object_permissions_for_profile(self, method, user, profile):
+        if profile is None:
+            return False
+        if method in permissions.SAFE_METHODS:
+            if self.profile == profile or self.profile.is_friends_with_profile(profile):
+                return True
+        return False
+
     profile = models.ForeignKey('m_profile.Profile',
                                 db_index=True,
                                 verbose_name=u'Origin',

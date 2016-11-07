@@ -18,12 +18,16 @@ from django.contrib import admin
 from rest_framework import routers, serializers, permissions, viewsets
 from django.contrib.auth.models import User, Group
 
-from m_chat.views import ConferenceViewSet
-
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
+from m_chat.views import DialogueViewSet, MessageViewSet, ConferenceViewSet, ConferenceMembershipViewSet
+from m_comment.views import CommentViewSet
+from m_event.views import EventViewSet
+from m_like.views import LikeViewSet
+from m_photo.views import PhotoAlbumViewSet, PhotoViewSet
 from m_post.views import PostViewSet, PostIncludeViewSet
-from m_profile.views import UserProfileViewSet
+from m_profile.views import FriendshipIncomingViewSet, CommunityProfileViewSet, UserProfileViewSet, FriendshipViewSet
+from m_profile.views import FriendshipOutgoingViewSet
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -49,12 +53,33 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 router = routers.DefaultRouter()
-router.register(r'conference', ConferenceViewSet)
-router.register(r'post', PostViewSet)
-router.register(r'post_include', PostIncludeViewSet)
-router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
-router.register(r'user_profiles', UserProfileViewSet)
+#router.register(r'users', UserViewSet)
+#router.register(r'groups', GroupViewSet)
+
+router.register(r'conference', ConferenceViewSet, base_name='conference')
+router.register(r'dialogue', DialogueViewSet, base_name='dialogue')
+router.register(r'conference_membership', ConferenceMembershipViewSet, base_name='conference_membership')
+router.register(r'message', MessageViewSet, base_name='message')
+#router.register(r'message_include', MessageIncludeViewSet)
+
+router.register(r'comment', CommentViewSet, base_name='comment')
+#router.register(r'comment_include', CommentIncludeViewSet, base_name='comment_include')
+
+router.register(r'event', EventViewSet, base_name='event')
+
+router.register(r'like', LikeViewSet, base_name='like')
+
+router.register(r'photo_album', PhotoAlbumViewSet, base_name='photo_album')
+router.register(r'photo', PhotoViewSet, base_name='photo')
+
+router.register(r'post', PostViewSet, base_name='post')
+router.register(r'post_include', PostIncludeViewSet, base_name='post_include')
+
+router.register(r'user_profile', UserProfileViewSet, base_name='user_profile')
+router.register(r'community_profile', CommunityProfileViewSet, base_name='community_profile')
+router.register(r'friendship_incoming', FriendshipIncomingViewSet, base_name='friendship_incoming')
+router.register(r'friendship_outgoing', FriendshipOutgoingViewSet, base_name='friendship_outgoing')
+router.register(r'friendship', FriendshipViewSet, base_name='friendship')
 
 urlpatterns = [
     url(r'^', include(router.urls)),

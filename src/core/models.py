@@ -7,6 +7,7 @@ from django.db import models
 # TODO: FIXME: Decide what the fuck to do with these deletes
 from django.utils.datetime_safe import datetime
 
+
 class DeletableMixin(models.Model):
     is_deleted = models.BooleanField(blank=False,
                                      null=False,

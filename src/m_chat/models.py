@@ -11,10 +11,25 @@ from django.contrib.contenttypes.models import ContentType
 # TODO: on_delete?
 # TODO: message read?
 #  Create your models here.
+from rest_framework import permissions
+
 from core.models import DeletableMixin
+from m_post.mixins import PostIncludableMixin
 
 
 class Chat(models.Model):
+    def is_profile_in_chat(self, profile):
+        if hasattr(self, 'conference'):
+            return self.conference.is_profile_in_chat(profile)
+        else:
+            return self.dialogue.is_profile_in_chat(profile)
+
+    def get_object_permissions_for_profile(self, method, user, profile):
+        if hasattr(self, 'conference'):
+            return self.conference.get_object_permissions_for_profile(method, user, profile)
+        else:
+            return self.dialogue.get_object_permissions_for_profile(method, user, profile)
+
     created_at = models.DateTimeField(auto_now_add=True,
                                       blank=False,
                                       editable=False,
@@ -29,6 +44,16 @@ class Chat(models.Model):
 
 
 class Conference(Chat):
+    def is_profile_in_chat(self, profile):
+        return self.is_active and self.membership.filter(is_deleted=False).filter(profile=profile).count() > 0
+
+    def get_object_permissions_for_profile(self, method, user, profile):
+        if profile is None or not self.is_active:
+            return False
+        if method in permissions.SAFE_METHODS:
+            return self.is_profile_in_chat(profile)
+        return False
+
     owner = models.ForeignKey('m_profile.Profile',
                               verbose_name=u'Conference owner',
                               related_name='owned_conference',
@@ -52,6 +77,16 @@ class Conference(Chat):
 
 
 class Dialogue(Chat):
+    def is_profile_in_chat(self, profile):
+        return self.profile1 == profile or self.profile2 == profile
+
+    def get_object_permissions_for_profile(self, method, user, profile):
+        if profile is None:
+            return False
+        if method in permissions.SAFE_METHODS:
+            return self.is_profile_in_chat(profile)
+        return False
+
     profile1 = models.ForeignKey('m_profile.Profile',
                                  db_index=True,
                                  verbose_name=u'First person',
@@ -65,6 +100,16 @@ class Dialogue(Chat):
 
 
 class ConferenceMembership(DeletableMixin):
+
+    def get_object_permissions_for_profile(self, method, user, profile):
+        if profile is None or self.is_deleted:
+            return False
+        if method in permissions.SAFE_METHODS:
+            return self.conference.is_profile_in_chat(profile)
+        if method == 'DELETE':
+            return self.profile == profile or self.conference.owner == profile
+        return False
+
     conference = models.ForeignKey(Conference,
                                    verbose_name=u'Conference',
                                    related_name='membership',
@@ -79,7 +124,21 @@ class ConferenceMembership(DeletableMixin):
                                     blank=False)
 
 
-class Message(DeletableMixin):
+class Message(DeletableMixin, PostIncludableMixin):
+    def tt_can_profile_include_in_post(self, profile):
+        if self.is_deleted:
+            return False
+        return self.chat.is_profile_in_chat(profile)
+
+    def get_object_permissions_for_profile(self, method, user, profile):
+        if profile is None or self.is_deleted:
+            return False
+        if method in permissions.SAFE_METHODS:
+            return self.sender == profile or self.chat.is_profile_in_chat(profile)
+        if method == 'DELETE':
+            return self.sender == profile
+        return False
+
     chat = models.ForeignKey(Chat,
                              verbose_name=u'Chat',
                              related_name='message',
@@ -99,7 +158,16 @@ class Message(DeletableMixin):
         index_together = [['chat', 'created_at'], ]
 
 
+# TODO: DRF
 class MessageInclude(models.Model):
+
+    def get_object_permissions_for_profile(self, method, user, profile):
+        if profile is None or self.message.is_deleted:
+            return False
+        if method in permissions.SAFE_METHODS:
+            return self.message.get_object_permissions_for_profile(method, user, profile)
+        return False
+
     message = models.ForeignKey(Message,
                                 db_index=True,
                                 verbose_name=u'Message',

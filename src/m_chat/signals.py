@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 
-from m_chat.models import Message, ConferenceMembership
+from m_chat.models import Message, ConferenceMembership, Conference
 
 
 def message_post_save(sender, instance, created, **kwargs):
@@ -22,7 +22,17 @@ def conference_membership_post_save(sender, instance, created, **kwargs):
             instance.conference.save()
 
 
+def conference_post_save(sender, instance, created, **kwargs):
+    if created:
+        cm = ConferenceMembership(conference=instance,
+                                  profile=instance.owner,
+                                  invite_from=instance.owner)
+        cm.save()
+
 post_save.connect(message_post_save, Message, dispatch_uid='tt_message_post_save')
 post_save.connect(conference_membership_post_save,
                   ConferenceMembership,
                   dispatch_uid='tt_conference_membership_post_save')
+post_save.connect(conference_post_save,
+                  Conference,
+                  dispatch_uid='tt_conference_post_save')
