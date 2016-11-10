@@ -31,6 +31,14 @@ class UserProfileViewSet(mixins.CreateModelMixin,
             raise PermissionDenied(detail='User already has a profile')
         serializer.save(owner=self.request.user)
 
+    def get_queryset(self):
+        qs = super(UserProfileViewSet, self).get_queryset()
+        if self.request.query_params.get('self'):
+            qs = qs.filter(owner=self.request.user)
+        if self.request.query_params.get('id'):
+            qs = qs.filter(id=self.request.query_params.get('id'))
+        return qs
+
 
 class CommunityProfileViewSet(viewsets.ModelViewSet):
     serializer_class = CommunityProfileSerializer
@@ -44,6 +52,11 @@ class CommunityProfileViewSet(viewsets.ModelViewSet):
         instance.is_deleted = True
         instance.save()
 
+    def get_queryset(self):
+        qs = super(CommunityProfileViewSet, self).get_queryset()
+        if self.request.query_params.get('self'):
+            qs = qs.filter(owner=self.request.user)
+        return qs
 
 class FriendshipIncomingViewSet(mixins.UpdateModelMixin,
                                 mixins.RetrieveModelMixin,

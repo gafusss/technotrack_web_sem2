@@ -17,9 +17,11 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, permissions, viewsets
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.views import login
 
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 
+from core.views import IndexView
 from m_chat.views import DialogueViewSet, MessageViewSet, ConferenceViewSet, ConferenceMembershipViewSet
 from m_comment.views import CommentViewSet
 from m_event.views import EventViewSet
@@ -60,10 +62,10 @@ router.register(r'conference', ConferenceViewSet, base_name='conference')
 router.register(r'dialogue', DialogueViewSet, base_name='dialogue')
 router.register(r'conference_membership', ConferenceMembershipViewSet, base_name='conference_membership')
 router.register(r'message', MessageViewSet, base_name='message')
-#router.register(r'message_include', MessageIncludeViewSet)
+# router.register(r'message_include', MessageIncludeViewSet)
 
 router.register(r'comment', CommentViewSet, base_name='comment')
-#router.register(r'comment_include', CommentIncludeViewSet, base_name='comment_include')
+# router.register(r'comment_include', CommentIncludeViewSet, base_name='comment_include')
 
 router.register(r'event', EventViewSet, base_name='event')
 
@@ -82,7 +84,9 @@ router.register(r'friendship_outgoing', FriendshipOutgoingViewSet, base_name='fr
 router.register(r'friendship', FriendshipViewSet, base_name='friendship')
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^login/', login, {'template_name': 'core/base.html'}, name='login'),
+    url(r'^api/', include(router.urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^social/', include('social.apps.django_app.urls', namespace='social')),
